@@ -2,16 +2,30 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-const App = () => {
-  const [item, setItem] = useState(1);
-  const incrementItem = () => setItem(item + 1);
-  const decrementItem = () => setItem(item - 1);
+const useInput = (initialValue, vaildator) => {
+  const [value, setValue] = useState(initialValue);
+  const onChange = (e) => {
+    const {
+      target: { value },
+    } = e;
+    let willUpdate = true;
+    if (typeof vaildator === "function") {
+      willUpdate = vaildator(value);
+    }
+    if (willUpdate) {
+      setValue(value);
+    }
+  };
+  return { value, onChange };
+};
 
+const App = () => {
+  const maxLen = (value) => value.length <= 10;
+  const name = useInput("Mr. ", maxLen);
   return (
     <div className="App">
-      <h1>hello {item}</h1>
-      <button onClick={incrementItem}>Increment</button>
-      <button onClick={decrementItem}>Decrement</button>
+      <h1>hello</h1>
+      <input placeholder="Name" {...name}></input>
     </div>
   );
 };
