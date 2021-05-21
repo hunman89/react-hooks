@@ -1,31 +1,38 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 
-const useInput = (initialValue, vaildator) => {
-  const [value, setValue] = useState(initialValue);
-  const onChange = (e) => {
-    const {
-      target: { value },
-    } = e;
-    let willUpdate = true;
-    if (typeof vaildator === "function") {
-      willUpdate = vaildator(value);
-    }
-    if (willUpdate) {
-      setValue(value);
-    }
+const content = [
+  {
+    tab: "Section 1",
+    content: "content section 1",
+  },
+  {
+    tab: "Section 2",
+    content: "content section 2",
+  },
+];
+
+const useTabs = (initalTab, allTabs) => {
+  const [currentIndex, setCurrentIndex] = useState(initalTab);
+
+  if (!allTabs || !Array.isArray(allTabs)) {
+    return;
+  }
+
+  return {
+    currentItem: allTabs[currentIndex],
+    changeItem: setCurrentIndex,
   };
-  return { value, onChange };
 };
 
 const App = () => {
-  const maxLen = (value) => value.length <= 10;
-  const name = useInput("Mr. ", maxLen);
+  const { currentItem, changeItem } = useTabs(0, content);
   return (
     <div className="App">
-      <h1>hello</h1>
-      <input placeholder="Name" {...name}></input>
+      {content.map((section, index) => (
+        <button onClick={() => changeItem(index)}>{section.tab}</button>
+      ))}
+      <div>{currentItem.content}</div>
     </div>
   );
 };
