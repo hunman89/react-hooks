@@ -1,28 +1,34 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
-const useFadeIn = (duration = 1, delay = 0) => {
-  const element = useRef();
-  useEffect(() => {
-    if (element.current) {
-      const { current } = element;
-      current.style.transition = `opacity ${duration}s ease-in-out ${delay}s`;
-      current.style.opacity = 1;
+const useNetwork = (onChange) => {
+  const [status, setStatus] = useState(navigator.onLine);
+  const handleChange = () => {
+    if (typeof onChange == "function") {
+      onChange(navigator.onLine);
     }
+    setStatus(navigator.onLine);
+  };
+
+  useEffect(() => {
+    window.addEventListener("online", handleChange);
+    window.addEventListener("offline", handleChange);
+    return () => {
+      window.removeEventListener("online", handleChange);
+      window.removeEventListener("offline", handleChange);
+    };
   });
-  if (typeof duration != "number" || typeof delay != "number") {
-    return;
-  }
-  return { ref: element, style: { opacity: 0 } };
+  return status;
 };
 
 const App = () => {
-  const fadeInH1 = useFadeIn(2, 1);
-  const fadeInP = useFadeIn(5, 3);
+  const handleNetworkChange = (online) => {
+    console.log(online ? "online" : "offline");
+  };
+  const onLine = useNetwork(handleNetworkChange);
   return (
     <div className="App">
-      <h1 {...fadeInH1}>hello</h1>
-      <p {...fadeInP}>lorem ipsum djfdiasjfieownefk</p>
+      <h1>{onLine ? "Online" : "offline"}</h1>
     </div>
   );
 };
