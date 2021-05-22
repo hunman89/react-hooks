@@ -1,31 +1,32 @@
-import React, { useRef } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 
-const useFullscreen = () => {
-  const element = useRef();
-  console.log(element);
-  const triggerFull = () => {
-    if (element.current) {
-      console.log(element.current);
-      element.current.requestFullscreen();
+const useNotification = (title, options) => {
+  if (!("Notification" in window)) {
+    return;
+  }
+  const fireNotif = () => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          console.log(title);
+          new Notification(title, options);
+        } else {
+          return;
+        }
+      });
+    } else {
+      new Notification(title);
     }
   };
-  const exitFull = () => {
-    document.exitFullscreen();
-  };
-  return { element, triggerFull, exitFull };
+  return fireNotif;
 };
 
 const App = () => {
-  const { element, triggerFull, exitFull } = useFullscreen();
+  const triggerNotif = useNotification("can i steal your kimchi?");
   return (
     <div className="App" style={{ height: "1000vh" }}>
-      <div ref={element}>
-        <img src="https://i.ibb.co/R6RwNxx/grape.jpg" alt="grape"></img>
-        <button onClick={triggerFull}>full screen</button>
-
-        <button onClick={exitFull}>exit full screen</button>
-      </div>
+      <button onClick={triggerNotif}>Notification</button>
     </div>
   );
 };
