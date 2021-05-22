@@ -1,25 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 
-const usePreventLeave = () => {
-  const listener = (event) => {
-    event.preventDefault();
-    event.returnValue = "";
+const useBeforeLeave = (onBefore) => {
+  const handle = (event) => {
+    const { clientY } = event;
+    if (clientY <= 0) {
+      onBefore();
+    }
   };
-  const enablePrevet = () => window.addEventListener("beforeunload", listener);
-  const disablePrevet = () =>
-    window.removeEventListener("beforeunload", listener);
-  return { enablePrevet, disablePrevet };
+  useEffect(() => {
+    document.addEventListener("mouseleave", handle);
+    return () => {
+      document.removeEventListener("mouseleave", handle);
+    };
+  });
+  if (typeof onBefore != "function") {
+    return;
+  }
 };
 
 const App = () => {
-  const { enablePrevet, disablePrevet } = usePreventLeave();
-  return (
-    <div className="App">
-      <button onClick={enablePrevet}>protect</button>
-      <button onClick={disablePrevet}>unprotect</button>
-    </div>
-  );
+  const begForLife = () => {
+    console.log("please don't leave");
+  };
+  useBeforeLeave(begForLife);
+  return <div className="App"></div>;
 };
 
 const rootElement = document.getElementById("root");
