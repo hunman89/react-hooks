@@ -1,25 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
 import ReactDOM from "react-dom";
 
-const useScroll = () => {
-  const [state, setstate] = useState({ x: 0, y: 0 });
-  const onScroll = () => {
-    setstate({ y: window.scrollY, x: window.scrollX });
+const useFullscreen = () => {
+  const element = useRef();
+  console.log(element);
+  const triggerFull = () => {
+    if (element.current) {
+      console.log(element.current);
+      element.current.requestFullscreen();
+    }
   };
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  });
-  return state;
+  const exitFull = () => {
+    document.exitFullscreen();
+  };
+  return { element, triggerFull, exitFull };
 };
 
 const App = () => {
-  const { y } = useScroll();
+  const { element, triggerFull, exitFull } = useFullscreen();
   return (
     <div className="App" style={{ height: "1000vh" }}>
-      <h1 style={{ position: "fixed", color: y > 100 ? "red" : "blue" }}>Hi</h1>
+      <div ref={element}>
+        <img src="https://i.ibb.co/R6RwNxx/grape.jpg" alt="grape"></img>
+        <button onClick={triggerFull}>full screen</button>
+
+        <button onClick={exitFull}>exit full screen</button>
+      </div>
     </div>
   );
 };
