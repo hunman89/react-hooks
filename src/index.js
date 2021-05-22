@@ -1,32 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
-const useNotification = (title, options) => {
-  if (!("Notification" in window)) {
-    return;
-  }
-  const fireNotif = () => {
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          console.log(title);
-          new Notification(title, options);
-        } else {
-          return;
-        }
-      });
-    } else {
-      new Notification(title);
-    }
-  };
-  return fireNotif;
-};
+import useAxious from "./useAxios";
 
 const App = () => {
-  const triggerNotif = useNotification("can i steal your kimchi?");
+  const { loading, data, error, refetch } = useAxious({
+    url: "yts.am/api/v2/list_movies.json",
+  });
+  console.log(
+    `Loading:${loading}\nError:${error}\nData:${JSON.stringify(data)}`
+  );
   return (
-    <div className="App" style={{ height: "1000vh" }}>
-      <button onClick={triggerNotif}>Notification</button>
+    <div className="App">
+      <h1>{data && data.status}</h1>
+      <h2>{loading && "Loading"}</h2>
+      <button onClick={refetch}>Refetch</button>
     </div>
   );
 };
